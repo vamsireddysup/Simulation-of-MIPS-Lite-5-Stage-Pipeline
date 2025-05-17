@@ -10,7 +10,7 @@
 
 //checking and injecting stalls for RAW(Read After Write True Dependency) Hazard
 
-//function for stall injection : 	Compares current instruction with past 2 to detect conflicts.
+//function for stall injection
 void stalls_inj(){
 	if (flag1 == 0) return;  //there's no instrn to process so can return
 	
@@ -25,5 +25,19 @@ void stalls_inj(){
 #define prev_rd(n) (rd(prev_inst(n)))
 #define prev_rt(n) (rt(prev_inst(n)))
 
-
-
+//checks 1 instruction back
+if(flag1 >= 1){
+	int pop = prev_op(1);		//opcode of previous inst
+	int prd = prev_rd(1);		//destn and secondary reg to compare with curr_sources
+	int prt = prev_rt(1);
+	
+	if(((prd == curr_rs) || (prd == curr_rd) || (prt == curr_rs) || (prt == curr_rd) && ((curr_op <= op_sub) || (curr_op  >= op_or && currOp <= op_xori) || curr_op == op_stw || curr_op == op_beq))
+	{
+		if (pop == OP_LDW || pop == OP_STW) {
+                frwdstalls++;
+            }
+            stalls += 2;
+            rawhazdect[Flag1] = -1;
+            return;
+        }
+    }
