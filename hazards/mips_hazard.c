@@ -41,3 +41,52 @@ if(flag1 >= 1){
             return;
         }
     }
+
+	    // 2-instructions back
+    if (flag1 >= 2) {
+        int prd2 = prev_rd(2);
+        if (prd2 == curr_rs || prd2 == curr_rd) {
+            stalls += 1;
+            rawhazdect[flag1] = -2;
+            return;
+        }
+    }
+
+    #undef prev_inst
+    #undef prev_op
+    #undef prev_rd
+    #undef prev_rt
+}
+
+//Hazard checker at Top-Level - checks and estimates brac=nch penalties
+void hazardshcecker() {
+    if (flag1 == 0) return;
+    if (flag1 >= 1 && branchflag[flag1-1]) {
+        penalties += 2;
+        flag2dict[flag1] = -1;
+        return;
+    }
+    if (flag1 >= 2 && branchflag[flag1-2]) {
+        stallsinjection();
+        return;
+    }
+    stallsinjection();
+}
+
+// Report Statistics logout
+void display() {
+    printf("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\n");
+    printf("                     Simulation Report\n");
+    printf("||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\n");
+    int totalinstrn = arithmeticinstrn + logicalinstrn + memoryinstrn + countmeminstrn;
+    printf("  Total instructions       : %d\n", totalinstrn);
+    printf("  Arithmetic             : %d\n", arithmeticinstrn);
+    printf("  Logical                : %d\n", logicalinstrn);
+    printf("  Memory (LD/ST)         : %d\n", memoryinstrn);
+    printf("  Control (branches,jr)  : %d\n", countmeminstrn);
+    printf("|||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||||\n");
+    printf("  Final Program Counter  : 0x%08X\n", ProgramCounter);
+    printf("----------------------------------------------------------------------\n");
+    printf("  Registers updated:\n");
+    
+
